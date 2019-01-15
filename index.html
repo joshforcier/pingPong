@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Game</title>
+    <style>
+        canvas { 
+            background: #eee; 
+            display: block; 
+            margin: 100px auto; 
+        }
+    </style>
+</head>
+
+<body>
+
+<canvas id="canvas" width="480" height="320"></canvas>
+
+<script>
+
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+
+    var xCord = canvas.width / 2;
+    var yCord = canvas.height / 2;
+    var xMotion = 0;
+    var yMotion = 2;
+
+    var ballRadius = 6;
+    var paddleHeight = 10;
+    var paddleWidth = 50;
+    var paddleTopX = (canvas.width - paddleWidth) / 2;
+    var paddleBottomX = (canvas.width - paddleWidth) / 2;
+
+    var rightTopPressed = false;
+    var leftTopPressed = false;
+    var rightBottomPressed = false;
+    var leftBottomPressed = false;
+
+    var score = 0;
+
+    document.addEventListener("keydown", keyDownHandler, false);
+    document.addEventListener("keyup", keyUpHandler, false);
+
+    function keyDownHandler(e) {
+        if (e.key == "d") {
+            rightTopPressed = true;
+        } else if (e.key == "a") {
+            leftTopPressed = true;
+        }
+
+        if (e.key == "6") {
+            rightBottomPressed = true;
+        } else if (e.key == "4") {  
+            leftBottomPressed = true;
+        }
+    }
+
+    function keyUpHandler(e) {
+        if (e.key == "d") {
+            rightTopPressed = false;
+        } else if (e.key == "a") {
+            leftTopPressed = false;
+        }
+
+        if (e.key == "6") {
+            rightBottomPressed = false;
+        } else if (e.key == "4") {  
+            leftBottomPressed = false;
+        }
+    }
+
+    function ball() 
+    {
+        ctx.beginPath();
+        ctx.arc(xCord, yCord, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = "black";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function paddleBottom() 
+    {
+        ctx.beginPath();
+        ctx.rect(paddleBottomX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+        ctx.fillStyle = "blue";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function paddleTop()
+    {
+        ctx.beginPath();
+        ctx.rect(paddleTopX, 0, paddleWidth, paddleHeight);
+        ctx.fillStyle = "blue";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function drawScore() {
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "#000";
+        ctx.fillText("Score: " + score, 8, 20);
+    }
+
+    function draw()
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ball();
+        paddleBottom();
+        paddleTop();
+        drawScore();
+        xCord += xMotion;
+        yCord += yMotion;
+
+        // side wall collision 
+        if (xCord + xMotion > canvas.width - ballRadius || xCord + xMotion < ballRadius ) {
+            xMotion = -xMotion;
+        }
+
+        // top wall collision
+        if (yCord + yMotion < ballRadius) {
+            // top paddle collision
+            if (xCord > paddleTopX && xCord < paddleTopX + paddleWidth) {
+                yMotion = -yMotion;
+                yMotion = yMotion * 1.005;
+                console.log(yMotion);
+                score++;
+                // change x direction depending on where ball hits paddle
+                if (xCord > paddleTopX + ((paddleWidth / 2) + 5) && xCord < paddleTopX + ((paddleWidth / 2) - 5)) {
+                    xMotion = 0;
+                } else if (xCord > paddleTopX + (paddleWidth / 2) && xCord < paddleTopX + paddleWidth) {
+                    xMotion += 0.5;
+                } else if (xCord > paddleTopX - (paddleWidth / 2) && xCord < paddleTopX + paddleWidth) {
+                    xMotion -= 0.5;
+                }
+            } else {
+                alert("GAME OVER, Score: " + score);
+                document.location.reload();
+            }
+        //bottom wall collision
+        } else if (yCord + yMotion > canvas.height - ballRadius) {
+            // bottom paddle collision
+            if (xCord > paddleBottomX && xCord < paddleBottomX + paddleWidth) {
+                yMotion = -yMotion;
+                yMotion = yMotion * 1.005;
+                score++;
+                // change x direction depending on where ball hits paddle
+                if (xCord > paddleBottomX + ((paddleWidth / 2) + 5) && xCord < paddleBottomX + ((paddleWidth / 2) - 5)) {
+                    xMotion = 0;
+                } else if (xCord > paddleBottomX + (paddleWidth / 2) && xCord < paddleBottomX + paddleWidth) {
+                    xMotion += 0.5;
+                } else if (xCord > paddleBottomX - (paddleWidth / 2) && xCord < paddleBottomX + paddleWidth) {
+                    xMotion -= 0.5;
+                }
+            } else {
+                alert("GAME OVER, Score: " + score);
+                document.location.reload();
+            }
+        }
+
+        if (rightTopPressed && paddleTopX < canvas.width-paddleWidth) {
+            paddleTopX += 6;
+        }
+        else if (leftTopPressed && paddleTopX > 0) {
+            paddleTopX -= 6;
+        }
+
+        if (rightBottomPressed && paddleBottomX < canvas.width-paddleWidth) {
+            paddleBottomX += 6;
+        }
+        else if (leftBottomPressed && paddleBottomX > 0) {
+            paddleBottomX -= 6;
+        }
+
+        requestAnimationFrame(draw);
+    }
+   
+    draw();
+
+</script>
+
+</body>
+</html>
