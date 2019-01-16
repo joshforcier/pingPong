@@ -136,7 +136,7 @@
                 }
             } else {
                 alert("GAME OVER, Score: " + score);
-                location.reload();
+                location.reload(true);
             }
         //bottom wall collision
         } else if (yCord + yMotion > canvas.height - ballRadius) {
@@ -155,7 +155,7 @@
                 }
             } else {
                 alert("GAME OVER, Score: " + score);
-                location.reload();
+                location.reload(true);
             }
         }
 
